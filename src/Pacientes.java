@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
 
 import javax.swing.JOptionPane;
 
@@ -10,13 +11,16 @@ public class Pacientes extends PacienteForm {
 	
 	
 	//selecionar da table
-	public Pacientes() {
-		table.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				tableMouseClicked(e);
-			}
-		});
+	
+	public Pacientes() throws ParseException {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	protected void tblSelecionarClick(MouseEvent ev) {
+		// TODO Auto-generated method stub
+		tableMouseClicked(ev);
 	}
 
 	@Override
@@ -32,8 +36,10 @@ public class Pacientes extends PacienteForm {
 			int resposta = JOptionPane.showConfirmDialog(null, "Criar registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
 			if(resposta == 0) {
 				this.model.cadastrarPaciente(p);
+				JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!");
 				limparCampos();
 				CodigoNovo();
+				
 			}
 		}
 	}
@@ -69,6 +75,7 @@ public class Pacientes extends PacienteForm {
 		
 		if(resposta == 0) {
 			this.model.alterarPaciente(index, p);
+			JOptionPane.showMessageDialog(this, "Usuário Editado com sucesso!");
 			limparCampos();
 			CodigoNovo();
 		}
@@ -84,6 +91,7 @@ public class Pacientes extends PacienteForm {
 		
 		if(resposta == 0) {
 			this.model.removerPaciente(index);
+			JOptionPane.showMessageDialog(this, "Usuário removido com sucesso!");
 			limparCampos();
 			CodigoNovo();			
 		}
@@ -133,6 +141,8 @@ public class Pacientes extends PacienteForm {
 		txtEndereco.setText(p.getEndereco());
 		txtObservacoes.setText(p.getObservacoes());
 	}
+
+	
 
 
 

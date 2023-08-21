@@ -3,12 +3,17 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,6 +25,7 @@ import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.MaskFormatter;
 
 import Pacientes.PacienteModel;
 
@@ -58,7 +64,7 @@ public abstract class PacienteForm extends JFrame{
 	protected JTextField txtPaciente;
 	//Data de nascimento
 	protected JLabel lblNascimento;
-	protected JTextField txtNascimento;
+	protected JFormattedTextField txtNascimento;
 	//Endereço
 	protected JLabel lblEndereco;
 	protected JTextField txtEndereco;
@@ -66,15 +72,16 @@ public abstract class PacienteForm extends JFrame{
 	protected JLabel lblObservacoes;
 	protected JTextField txtObservacoes;
 	
-	public PacienteForm() {
+	public PacienteForm() throws ParseException {
 		this.inicializar();
 		this.eventos();
 	}
 	
-	private void inicializar() {	
+	private void inicializar() throws ParseException {	
 		this.setTitle("Pacientes");		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+		//layouts
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(getPnlForm(), BorderLayout.NORTH);
 		this.getContentPane().add(getPnlBtn(), BorderLayout.CENTER);
@@ -93,6 +100,7 @@ public abstract class PacienteForm extends JFrame{
 	protected abstract void btnListarClick(ActionEvent ev);
 	protected abstract void btnExcluirClick(ActionEvent ev);
 	protected abstract void btnAlterarClick(ActionEvent ev);
+	protected abstract void tblSelecionarClick(MouseEvent ev);
 	
 	private void eventos() {
 		//cadastrar
@@ -109,9 +117,17 @@ public abstract class PacienteForm extends JFrame{
 		
 		//alterar
 		btnAlterar.addActionListener(this::btnAlterarClick);
-				}
+		
+		//selecionar registro da table
+		table.addMouseListener(new MouseAdapter() {
+            @Override
+			public void mouseClicked(MouseEvent ev) {
+                tblSelecionarClick(ev);
+            }
+        });
+		}
 	
-	public JPanel getPnlForm() {
+	public JPanel getPnlForm() throws ParseException {
 		if(pnlForm == null) {
 			pnlForm = new JPanel(new GridLayout(5, 2));
 			
@@ -127,7 +143,9 @@ public abstract class PacienteForm extends JFrame{
 			  
 			//Data de nascimento
 			lblNascimento = new JLabel("Nascimento (dd/mm/yyyy)");
-			txtNascimento = new JTextField(10);
+			
+			MaskFormatter maskFormatter = new MaskFormatter("##/##/####");
+			txtNascimento = new JFormattedTextField(maskFormatter);
 			txtNascimento.setToolTipText("Formato: dd/mm/yyyy");
 			txtNascimento.setInputVerifier(new InputVerifier() {
 				@Override
