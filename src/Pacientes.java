@@ -5,7 +5,6 @@ import java.text.ParseException;
 import javax.swing.JOptionPane;
 
 import Pacientes.Paciente;
-import java.awt.event.MouseAdapter;
 
 public class Pacientes extends PacienteForm {
 	
@@ -26,20 +25,22 @@ public class Pacientes extends PacienteForm {
 	@Override
 	protected void btnCadastrarClick(ActionEvent ev) {
 		// TODO Auto-generated method stub
-
-		Paciente p = inserirDados();
+		
+		String codigo = Integer.toString(table.getRowCount()+1);
 		String nome = txtPaciente.getText();
 		String nascimento = txtNascimento.getText();
 		String endereco = txtEndereco.getText();
+		String observacao = txtObservacoes.getText();
 		
-		if(validarCampos(nome, nascimento ,endereco)) {
+		Paciente p = new Paciente(codigo, nome, nascimento, endereco, observacao);
+		
+		if(validarCampos(nome, nascimento ,endereco) && codigoUnico(codigo)) {
 			int resposta = JOptionPane.showConfirmDialog(null, "Criar registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
 			if(resposta == 0) {
 				this.model.cadastrarPaciente(p);
 				JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!");
 				limparCampos();
 				CodigoNovo();
-				
 			}
 		}
 	}
@@ -47,53 +48,68 @@ public class Pacientes extends PacienteForm {
 	@Override
 	protected void btnEditarClick(ActionEvent ev) {
 		// TODO Auto-generated method stub
-		lblEditar.setVisible(true);
-		txtPesquisar.setVisible(true);
-		btnAlterar.setVisible(true);
-
-		pnlPe.setVisible(true);
-		//pnlBtn.setVisible(false);
-		btnEditar.setVisible(false);
-		btnListar.setVisible(false);
+		
+		int index = table.getRowCount();
+		if(index == 0) {
+			JOptionPane.showMessageDialog(this, "Não há usuários para editar");
+		}else {
+			lblEditar.setVisible(true);
+			txtPesquisar.setVisible(true);
+			btnAlterar.setVisible(true);
+			pnlPe.setVisible(true);
+			btnEditar.setVisible(false);
+			btnListar.setVisible(false);	
+		}
 	}
 
 	@Override
 	protected void btnListarClick(ActionEvent ev) {
 		// TODO Auto-generated method stub
-		
-		pnlPe.setVisible(true);
+		if(table.getRowCount()==0){
+			JOptionPane.showMessageDialog(this, "Ainda não há pacientes cadastrados");
+		}else {
+			pnlPe.setVisible(true);
+		}
 	}
 	
 	@Override
 	protected void btnAlterarClick(ActionEvent ev) {
 		// TODO Auto-generated method stub
 		
-		Paciente p = inserirDados();
 		int index = table.getSelectedRow();
-		
-		int resposta = JOptionPane.showConfirmDialog(null, "Alterar registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
-		
-		if(resposta == 0) {
-			this.model.alterarPaciente(index, p);
-			JOptionPane.showMessageDialog(this, "Usuário Editado com sucesso!");
-			limparCampos();
-			CodigoNovo();
+		if(index == -1) {
+			JOptionPane.showMessageDialog(this, "Selecione um usuário para editar!");
+		}else {
+			Paciente p = this.model.returnPaciente(index);
+			int resposta = JOptionPane.showConfirmDialog(null, "Alterar registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
+			
+			if(resposta == 0) {
+				this.model.alterarPaciente(index, p);
+				JOptionPane.showMessageDialog(this, "Usuário Editado com sucesso!");
+				limparCampos();
+				CodigoNovo();
+			}
+			
 		}
 		
 	}
+
 
 	@Override
 	protected void btnExcluirClick(ActionEvent ev) {
 		// TODO Auto-generated method stub
 		int index = table.getSelectedRow();
-		
-		int resposta = JOptionPane.showConfirmDialog(null, "Remover registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
-		
-		if(resposta == 0) {
-			this.model.removerPaciente(index);
-			JOptionPane.showMessageDialog(this, "Usuário removido com sucesso!");
-			limparCampos();
-			CodigoNovo();			
+		if(index == -1) {
+			JOptionPane.showMessageDialog(this, "Escolha um usuário para remover primeiro");
+		}else {
+			int resposta = JOptionPane.showConfirmDialog(null, "Remover registro?", "Deletar", JOptionPane.OK_CANCEL_OPTION);
+			
+			if(resposta == 0) {
+				this.model.removerPaciente(index);
+				JOptionPane.showMessageDialog(this, "Usuário removido com sucesso!");
+				limparCampos();
+				CodigoNovo();			
+			}			
 		}
 	}
 	
@@ -116,7 +132,14 @@ public class Pacientes extends PacienteForm {
 			JOptionPane.showMessageDialog(this, "Campos não preenchidos");
 			return false;
 		}
-		
+		return true;
+	}
+	
+	public boolean codigoUnico(String codigo) {
+		if(this.model.pacienteExiste(codigo)) {
+			JOptionPane.showMessageDialog(this, "Codigo não é único");
+			return false;
+		}
 		return true;
 	}
 	
@@ -141,15 +164,4 @@ public class Pacientes extends PacienteForm {
 		txtEndereco.setText(p.getEndereco());
 		txtObservacoes.setText(p.getObservacoes());
 	}
-
-	
-
-
-
-
-
-
-	
-
-	
 }

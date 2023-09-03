@@ -38,7 +38,7 @@ public abstract class PacienteForm extends JFrame{
 
 	PacienteModel model = new PacienteModel();
 	TableRowSorter<PacienteModel> sorter = new TableRowSorter<PacienteModel>(model);
-
+	
 	//panels
 	protected JPanel pnlBtn;
 	protected JPanel pnlForm;
@@ -55,7 +55,7 @@ public abstract class PacienteForm extends JFrame{
 	protected JTextField txtPesquisar;
 	protected JButton btnAlterar;
 	protected JLabel lblEditar;
-
+	
 	//código
 	protected JLabel lblCodigo;
 	protected JTextField txtCodigo;
@@ -78,11 +78,12 @@ public abstract class PacienteForm extends JFrame{
 	}
 	
 	private void inicializar() throws ParseException {	
-		this.setTitle("Pacientes");		
+		this.setTitle("Pacientes");	
+		this.setSize(600,600);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//layouts
-		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().setLayout(new BorderLayout(0,0));
 		this.getContentPane().add(getPnlForm(), BorderLayout.NORTH);
 		this.getContentPane().add(getPnlBtn(), BorderLayout.CENTER);
 		this.getContentPane().add(getPnlPe(), BorderLayout.SOUTH);
@@ -227,27 +228,24 @@ public abstract class PacienteForm extends JFrame{
 			table = new JTable(model);
 			table.setRowSorter(sorter);
 			txtPesquisar.getDocument().addDocumentListener(new DocumentListener(){
-
+				
 				@Override
 				public void insertUpdate(DocumentEvent e) {
 					model.fireTableDataChanged();
 				}
-
 				@Override
 				public void removeUpdate(DocumentEvent e) {
 					model.fireTableDataChanged();					
 				}
-
 				@Override
 				public void changedUpdate(DocumentEvent e) {
 					model.fireTableDataChanged();					
 				}
-				
 			});
 			
-			sorter.setRowFilter(new RowFilter() {
+			sorter.setRowFilter(new RowFilter<Object, Object>() {
 				@Override
-				public boolean include(Entry entry) {
+				public boolean include(Entry<?, ?> entry) {
 					String name = entry.getValue(1).toString().toLowerCase();
 					String searchText = txtPesquisar.getText().toLowerCase();
 					return name.startsWith(searchText);
